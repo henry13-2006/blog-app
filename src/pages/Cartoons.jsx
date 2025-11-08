@@ -75,10 +75,10 @@ function Cartoons() {
         </Typography>
       </Box>
 
-      {/* Video Grid - Full Width */}
-      <Grid container spacing={3} sx={{ width: '100%', maxWidth: '100%' }}>
+      {/* Video Grid - Fully Responsive */}
+      <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ width: '100%' }}>
         {videos.map((video) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} xl={2.4} key={video.id}>
+          <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2} key={video.id}>
             <Card
               sx={{
                 height: '100%',
@@ -87,26 +87,31 @@ function Cartoons() {
                 boxShadow: 3,
                 transition: 'all 0.3s ease',
                 '&:hover': {
-                  transform: 'translateY(-8px)',
-                  boxShadow: 6,
+                  transform: { xs: 'none', sm: 'translateY(-4px)', md: 'translateY(-8px)' },
+                  boxShadow: { xs: 2, sm: 4, md: 6 },
                   '& .play-button': {
                     opacity: 1,
                     transform: 'scale(1.1)'
                   }
                 },
-                borderRadius: 3,
+                borderRadius: { xs: 2, sm: 3 },
                 cursor: 'pointer',
-                background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)'
+                background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
+                mx: 'auto',
+                maxWidth: '100%'
               }}
               onClick={() => handleVideoClick(video.videoId)}
             >
               <Box sx={{ position: 'relative' }}>
                 <CardMedia
                   component="img"
-                  height="180"
+                  height={{ xs: 120, sm: 140, md: 160, lg: 180 }}
                   image={video.thumbnail}
                   alt={video.title}
-                  sx={{ objectFit: 'cover' }}
+                  sx={{
+                    objectFit: 'cover',
+                    width: '100%'
+                  }}
                 />
                 {/* Play button overlay */}
                 <Box
@@ -118,8 +123,8 @@ function Cartoons() {
                     transform: 'translate(-50%, -50%)',
                     backgroundColor: 'rgba(255, 20, 147, 0.9)',
                     borderRadius: '50%',
-                    width: 50,
-                    height: 50,
+                    width: { xs: 35, sm: 40, md: 45, lg: 50 },
+                    height: { xs: 35, sm: 40, md: 45, lg: 50 },
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -128,10 +133,17 @@ function Cartoons() {
                     boxShadow: '0 4px 12px rgba(255, 20, 147, 0.4)'
                   }}
                 >
-                  <PlayArrowIcon sx={{ color: 'white', fontSize: 24 }} />
+                  <PlayArrowIcon sx={{
+                    color: 'white',
+                    fontSize: { xs: 16, sm: 18, md: 20, lg: 24 }
+                  }} />
                 </Box>
               </Box>
-              <CardContent sx={{ flexGrow: 1, p: 2 }}>
+              <CardContent sx={{
+                flexGrow: 1,
+                p: { xs: 1, sm: 1.5, md: 2 },
+                '&:last-child': { pb: { xs: 1, sm: 1.5, md: 2 } }
+              }}>
                 <Typography
                   variant="subtitle1"
                   component="h2"
@@ -139,16 +151,23 @@ function Cartoons() {
                   sx={{
                     fontWeight: 'bold',
                     lineHeight: 1.3,
-                    fontSize: '0.9rem',
+                    fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.9rem' },
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
                   }}
                 >
                   {video.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' }
+                  }}
+                >
                   {video.channelTitle}
                 </Typography>
               </CardContent>

@@ -75,10 +75,10 @@ function Videos() {
         </Typography>
       </Box>
 
-      {/* Video Grid */}
-      <Grid container spacing={4}>
+      {/* Video Grid - Fully Responsive */}
+      <Grid container spacing={{ xs: 1, sm: 2, md: 3, lg: 4 }}>
         {videos.map((video) => (
-          <Grid item xs={12} sm={6} lg={4} key={video.id}>
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3} key={video.id}>
             <Card
               sx={{
                 height: '100%',
@@ -86,19 +86,27 @@ function Videos() {
                 flexDirection: 'column',
                 boxShadow: 3,
                 transition: 'all 0.3s ease',
-                '&:hover': { transform: 'translateY(-8px)', boxShadow: 6 },
-                borderRadius: 3,
-                cursor: 'pointer'
+                '&:hover': {
+                  transform: { xs: 'none', sm: 'translateY(-4px)', md: 'translateY(-8px)' },
+                  boxShadow: { xs: 2, sm: 4, md: 6 }
+                },
+                borderRadius: { xs: 2, sm: 3 },
+                cursor: 'pointer',
+                mx: 'auto',
+                maxWidth: { xs: '100%', sm: '100%', md: '100%' }
               }}
               onClick={() => handleVideoClick(video.videoId)}
             >
               <Box sx={{ position: 'relative' }}>
                 <CardMedia
                   component="img"
-                  height="225"
+                  height={{ xs: 180, sm: 200, md: 225 }}
                   image={video.thumbnail}
                   alt={video.title}
-                  sx={{ objectFit: 'cover' }}
+                  sx={{
+                    objectFit: 'cover',
+                    width: '100%'
+                  }}
                 />
                 {/* Play button overlay */}
                 <Box
@@ -109,8 +117,8 @@ function Videos() {
                     transform: 'translate(-50%, -50%)',
                     backgroundColor: 'rgba(0, 0, 0, 0.7)',
                     borderRadius: '50%',
-                    width: 60,
-                    height: 60,
+                    width: { xs: 40, sm: 50, md: 60 },
+                    height: { xs: 40, sm: 50, md: 60 },
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -121,17 +129,51 @@ function Videos() {
                     }
                   }}
                 >
-                  <PlayArrowIcon sx={{ color: 'white', fontSize: 30 }} />
+                  <PlayArrowIcon sx={{
+                    color: 'white',
+                    fontSize: { xs: 20, sm: 24, md: 30 }
+                  }} />
                 </Box>
               </Box>
-              <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                <Typography variant="h6" component="h2" gutterBottom sx={{ fontWeight: 'bold', lineHeight: 1.3 }}>
-                  {video.title.length > 60 ? `${video.title.substring(0, 60)}...` : video.title}
+              <CardContent sx={{
+                flexGrow: 1,
+                p: { xs: 1.5, sm: 2, md: 3 },
+                '&:last-child': { pb: { xs: 1.5, sm: 2, md: 3 } }
+              }}>
+                <Typography
+                  variant="h6"
+                  component="h2"
+                  gutterBottom
+                  sx={{
+                    fontWeight: 'bold',
+                    lineHeight: 1.3,
+                    fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
+                  {video.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    mb: 1,
+                    fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.875rem' }
+                  }}
+                >
                   {video.channelTitle}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.875rem' }
+                  }}
+                >
                   {video.views}
                 </Typography>
               </CardContent>

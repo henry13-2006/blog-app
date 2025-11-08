@@ -57,7 +57,12 @@ function Register() {
   }
 
   return (
-    <Box sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
+    <Box sx={{
+      maxWidth: { xs: '100%', sm: 400 },
+      mx: 'auto',
+      mt: { xs: 2, sm: 4 },
+      px: { xs: 2, sm: 0 }
+    }}>
       <Typography variant="h4" gutterBottom align="center">
         Register
       </Typography>
