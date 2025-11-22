@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Box, Typography, Card, CardContent, CardMedia, Chip, Divider, CircularProgress } from '@mui/material'
 import MovieIcon from '@mui/icons-material/Movie'
 import AnimationIcon from '@mui/icons-material/Animation'
-import { tmdbApi, getImageUrl } from '../services/tmdbApi'
+import { omdbApi, getPosterUrl } from '../services/tmdbApi'
 
 function Sidebar() {
   const [movies, setMovies] = useState([])
@@ -14,18 +14,18 @@ function Sidebar() {
       try {
         setLoading(true)
 
-        // Fetch real movies from TMDB
-        const movieData = await tmdbApi.getNowPlaying()
+        // Fetch popular movies from OMDB
+        const movieData = await omdbApi.getPopularMovies()
 
-        // Transform TMDB movie data
+        // Transform OMDB movie data
         const movieItems = movieData.map((movie) => ({
-          id: movie.id,
-          title: movie.title?.substring(0, 30) + (movie.title?.length > 30 ? '...' : '') || 'Movie',
-          image: getImageUrl(movie.poster_path),
-          rating: movie.vote_average?.toFixed(1) || 'N/A'
+          id: movie.imdbID,
+          title: movie.Title?.substring(0, 30) + (movie.Title?.length > 30 ? '...' : '') || 'Movie',
+          image: getPosterUrl(movie.Poster),
+          rating: movie.imdbRating || 'N/A'
         }))
 
-        // Fetch cartoons using NewsAPI (TMDB doesn't have great cartoon data)
+        // Fetch cartoons using NewsAPI (OMDB also works for cartoons)
         const cartoonResponse = await fetch(`https://newsapi.org/v2/everything?q=cartoon+network+OR+disney+channel+OR+"spider-man"+OR+"elemental"+OR+"nimona"+OR+pixar+OR+"turning+red"&sortBy=publishedAt&pageSize=3&apiKey=933c654a6f30457ba2032b23d6c1564b`)
         const cartoonData = await cartoonResponse.json()
 
