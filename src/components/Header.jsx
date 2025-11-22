@@ -3,12 +3,10 @@ import { AppBar, Toolbar, Typography, Button, Box, TextField, InputAdornment, Ic
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import SearchIcon from '@mui/icons-material/Search'
 import MenuIcon from '@mui/icons-material/Menu'
-import { useAuth } from '../contexts/AuthContext'
 
 function Header() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { isAuthenticated, user, logout } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const theme = useTheme()
@@ -123,23 +121,7 @@ function Header() {
             </Box>
           )}
 
-          {/* User Section - Always visible */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {isAuthenticated ? (
-              <>
-                <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
-                  {user?.name}
-                </Typography>
-                <Button color="inherit" onClick={logout} size="small">
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <Button color="inherit" component={Link} to="/login" size="small">
-                Login
-              </Button>
-            )}
-          </Box>
+
         </Toolbar>
       </AppBar>
 
