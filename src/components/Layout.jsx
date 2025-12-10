@@ -2,9 +2,8 @@ import { Box, Container, useTheme, useMediaQuery } from '@mui/material'
 import Header from './Header'
 import Footer from './Footer'
 import Sidebar from './Sidebar'
-import { Outlet } from 'react-router-dom'
 
-function Layout() {
+function Layout({ children }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'))
   const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -50,7 +49,7 @@ function Layout() {
               display: 'flex',
               flexDirection: 'column'
             }}>
-              <Outlet />
+              {children}
             </Box>
             {!isMobile && (
               <Box sx={{

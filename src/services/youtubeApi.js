@@ -1,44 +1,70 @@
 import axios from 'axios'
 
-const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY
-const YOUTUBE_API_BASE_URL = 'https://www.googleapis.com/youtube/v3'
+// Dailymotion API (no API key required for basic access)
+const DAILYMOTION_BASE_URL = 'https://api.dailymotion.com'
 
-// YouTube API service
+// Dailymotion API service
 export const youtubeApi = {
-  // Search for videos
+  // Search for videos (maps to Dailymotion search)
   searchVideos: async (query, maxResults = 12) => {
     try {
-      const response = await axios.get(`${YOUTUBE_API_BASE_URL}/search`, {
+      const response = await axios.get(`${DAILYMOTION_BASE_URL}/videos`, {
         params: {
-          key: YOUTUBE_API_KEY,
-          q: query,
-          part: 'snippet',
-          type: 'video',
-          maxResults,
-          order: 'relevance',
-          safeSearch: 'moderate'
+          search: query,
+          limit: maxResults,
+          fields: 'id,title,description,thumbnail_url,duration,views_total,created_time',
+          sort: 'relevance'
         }
       })
-      return response.data.items
+
+      // Transform Dailymotion data to match YouTube format for compatibility
+      return response.data.list.map(video => ({
+        id: video.id,
+        snippet: {
+          title: video.title,
+          description: video.description,
+          thumbnails: {
+            medium: { url: video.thumbnail_url }
+          },
+          publishedAt: video.created_time
+        },
+        statistics: {
+          viewCount: video.views_total
+        }
+      }))
     } catch (error) {
-      console.error('Error fetching YouTube videos:', error)
+      console.error('Error fetching Dailymotion videos:', error)
       throw error
     }
   },
 
-  // Get popular videos
+  // Get popular videos (trending videos)
   getPopularVideos: async (maxResults = 12) => {
     try {
-      const response = await axios.get(`${YOUTUBE_API_BASE_URL}/videos`, {
+      const response = await axios.get(`${DAILYMOTION_BASE_URL}/videos`, {
         params: {
-          key: YOUTUBE_API_KEY,
-          part: 'snippet,statistics',
-          chart: 'mostPopular',
-          maxResults,
-          regionCode: 'US'
+          flags: 'featured', // Get featured/popular videos
+          limit: maxResults,
+          fields: 'id,title,description,thumbnail_url,duration,views_total,created_time',
+          sort: 'trending'
         }
       })
-      return response.data.items
+
+      // Transform to YouTube-like format
+      return response.data.list.map(video => ({
+        id: video.id,
+        snippet: {
+          title: video.title,
+          description: video.description,
+          thumbnails: {
+            medium: { url: video.thumbnail_url }
+          },
+          publishedAt: video.created_time
+        },
+        statistics: {
+          viewCount: video.views_total
+        }
+      }))
     } catch (error) {
       console.error('Error fetching popular videos:', error)
       throw error
@@ -48,19 +74,28 @@ export const youtubeApi = {
   // Search for cartoons/kids content
   getCartoonVideos: async (maxResults = 20) => {
     try {
-      const response = await axios.get(`${YOUTUBE_API_BASE_URL}/search`, {
+      const response = await axios.get(`${DAILYMOTION_BASE_URL}/videos`, {
         params: {
-          key: YOUTUBE_API_KEY,
-          q: 'cartoons OR animation OR kids OR children',
-          part: 'snippet',
-          type: 'video',
-          maxResults,
-          order: 'relevance',
-          safeSearch: 'strict',
-          videoCategoryId: '1' // Film & Animation category
+          search: 'cartoon OR animation OR kids OR children OR disney OR pixar',
+          limit: maxResults,
+          fields: 'id,title,description,thumbnail_url,duration,views_total,created_time',
+          sort: 'relevance'
         }
       })
-      return response.data.items
+
+      // Transform to YouTube-like format
+      return response.data.list.map(video => ({
+        id: { videoId: video.id }, // Dailymotion uses different ID structure
+        snippet: {
+          title: video.title,
+          description: video.description,
+          thumbnails: {
+            medium: { url: video.thumbnail_url }
+          },
+          channelTitle: 'Dailymotion',
+          publishedAt: video.created_time
+        }
+      }))
     } catch (error) {
       console.error('Error fetching cartoon videos:', error)
       throw error
@@ -70,26 +105,36 @@ export const youtubeApi = {
   // Get video details
   getVideoDetails: async (videoId) => {
     try {
-      const response = await axios.get(`${YOUTUBE_API_BASE_URL}/videos`, {
+      const response = await axios.get(`${DAILYMOTION_BASE_URL}/video/${videoId}`, {
         params: {
-          key: YOUTUBE_API_KEY,
-          id: videoId,
-          part: 'snippet,statistics,contentDetails'
+          fields: 'id,title,description,thumbnail_url,duration,views_total,created_time'
         }
       })
-      return response.data.items[0]
+
+      return {
+        id: response.data.id,
+        snippet: {
+          title: response.data.title,
+          description: response.data.description,
+          thumbnails: {
+            medium: { url: response.data.thumbnail_url }
+          }
+        },
+        statistics: {
+          viewCount: response.data.views_total
+        }
+      }
     } catch (error) {
       console.error('Error fetching video details:', error)
       throw error
     }
   },
 
-  // Format duration from ISO 8601 to readable format
-  formatDuration: (duration) => {
-    const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/)
-    const hours = (match[1] || '').replace('H', '') || 0
-    const minutes = (match[2] || '').replace('M', '') || 0
-    const seconds = (match[3] || '').replace('S', '') || 0
+  // Format duration (Dailymotion gives duration in seconds)
+  formatDuration: (durationInSeconds) => {
+    const hours = Math.floor(durationInSeconds / 3600)
+    const minutes = Math.floor((durationInSeconds % 3600) / 60)
+    const seconds = durationInSeconds % 60
 
     if (hours > 0) {
       return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`

@@ -29,7 +29,7 @@ function Header() {
     { path: '/events', label: 'Events' },
     { path: '/sports', label: 'Sports' },
     { path: '/videos', label: 'Videos' },
-    { path: '/cartoons', label: '🎬 Cartoons' },
+    { path: '/cartoons', label: 'Cartoons' },
   ]
 
   const toggleMobileMenu = () => {
