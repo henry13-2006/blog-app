@@ -42,13 +42,34 @@ const makeApiCall = async (url, params) => {
 
 // Category configurations with specific search queries
 const categoryConfigs = {
-  fashion: { query: 'fashion OR style OR clothing OR designer OR runway OR couture', sortBy: 'publishedAt' },
-  luxury: { query: 'luxury brands OR designer fashion OR high fashion OR couture OR luxury lifestyle OR luxury cars OR luxury watches OR premium fashion', sortBy: 'publishedAt' },
-  lifestyle: { query: 'lifestyle OR wellness OR home OR family OR daily life OR productivity OR self-care', sortBy: 'publishedAt' },
-  beauty: { query: 'beauty OR skincare OR makeup OR cosmetics OR wellness OR spa OR grooming', sortBy: 'publishedAt' },
-  travel: { query: 'travel OR vacation OR tourism OR destination OR adventure OR holiday OR trip', sortBy: 'publishedAt' },
-  events: { query: 'events OR entertainment OR concert OR festival OR show OR party OR celebration', sortBy: 'publishedAt' },
-  sports: { query: 'sports OR football OR basketball OR soccer OR tennis OR athletics OR championship', sortBy: 'publishedAt' }
+  fashion: {
+    query: 'fashion design OR fashion week OR fashion industry OR fashion trends OR fashion show OR fashion designer OR fashion brand',
+    sortBy: 'publishedAt'
+  },
+  luxury: {
+    query: 'luxury fashion OR luxury lifestyle OR luxury brands OR designer clothing OR luxury cars OR luxury watches OR high-end fashion OR premium lifestyle',
+    sortBy: 'publishedAt'
+  },
+  lifestyle: {
+    query: 'lifestyle OR wellness OR home design OR family life OR daily living OR productivity OR self-improvement OR home improvement',
+    sortBy: 'publishedAt'
+  },
+  beauty: {
+    query: 'beauty industry OR skincare OR makeup OR cosmetics OR beauty trends OR beauty products OR beauty brands OR spa treatments',
+    sortBy: 'publishedAt'
+  },
+  travel: {
+    query: 'travel OR vacation OR tourism OR travel destinations OR travel tips OR travel industry OR travel trends OR adventure travel',
+    sortBy: 'publishedAt'
+  },
+  events: {
+    query: 'entertainment events OR music events OR cultural events OR art exhibitions OR theater OR film festivals OR entertainment industry',
+    sortBy: 'publishedAt'
+  },
+  sports: {
+    query: 'sports OR football OR basketball OR soccer OR tennis OR athletics OR sports championship OR sports news OR professional sports',
+    sortBy: 'publishedAt'
+  }
 }
 
 export const newsApi = {
