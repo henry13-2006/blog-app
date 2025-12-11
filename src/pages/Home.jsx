@@ -11,11 +11,23 @@ function Home() {
     const fetchLatestArticles = async () => {
       try {
         setLoading(true)
+        console.log('Fetching latest articles...')
+        console.log('API Key available:', !!import.meta.env.VITE_NEWS_API_KEY)
+
         const latestArticles = await newsApi.getLatestArticles(12)
+        console.log('Articles received:', latestArticles?.length || 0)
+        console.log('First article:', latestArticles?.[0])
+
         setArticles(latestArticles)
       } catch (err) {
-        setError('Failed to load latest articles')
         console.error('Error fetching latest articles:', err)
+        console.error('Error details:', {
+          message: err.message,
+          status: err.response?.status,
+          statusText: err.response?.statusText,
+          data: err.response?.data
+        })
+        setError(`Failed to load latest articles: ${err.message}`)
       } finally {
         setLoading(false)
       }

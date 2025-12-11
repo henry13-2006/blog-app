@@ -3,6 +3,31 @@ import axios from 'axios'
 const API_KEY = import.meta.env.VITE_NEWS_API_KEY
 const BASE_URL = 'https://newsapi.org/v2'
 
+// CORS proxy for development/production
+const CORS_PROXY = 'https://api.allorigins.win/get?url='
+const USE_CORS_PROXY = true // Set to false if you have a different CORS solution
+
+// Helper function to make API calls with CORS proxy if needed
+const makeApiCall = async (url, params) => {
+  if (USE_CORS_PROXY) {
+    // Use CORS proxy
+    const fullUrl = `${CORS_PROXY}${encodeURIComponent(url + '?' + new URLSearchParams(params).toString())}`
+    console.log('Using CORS proxy URL:', fullUrl)
+
+    const response = await axios.get(fullUrl)
+    console.log('CORS proxy response status:', response.status)
+
+    // The CORS proxy wraps the response in a 'contents' field
+    const actualData = JSON.parse(response.data.contents)
+    console.log('Parsed data status:', actualData.status)
+    return actualData
+  } else {
+    // Direct API call
+    const response = await axios.get(url, { params })
+    return response.data
+  }
+}
+
 // Category configurations with specific search queries
 const categoryConfigs = {
   fashion: { query: 'fashion OR style OR clothing OR designer OR runway OR couture', sortBy: 'publishedAt' },
@@ -18,34 +43,47 @@ export const newsApi = {
   // Get top headlines by category with keyword filtering
   async getTopHeadlines(category = 'general', pageSize = 20) {
     try {
+      console.log('NewsAPI: getTopHeadlines called with category:', category)
+      console.log('NewsAPI: API_KEY available:', !!API_KEY)
+
       const config = categoryConfigs[category.toLowerCase()]
 
       if (config) {
+        console.log('NewsAPI: Using everything endpoint with query:', config.query)
         // Use /everything endpoint with keywords for better category filtering
-        const response = await axios.get(`${BASE_URL}/everything`, {
-          params: {
-            apiKey: API_KEY,
-            q: config.query,
-            pageSize,
-            sortBy: 'publishedAt',
-            language: 'en'
-          }
-        })
-        return response.data.articles
+        const params = {
+          apiKey: API_KEY,
+          q: config.query,
+          pageSize: pageSize.toString(),
+          sortBy: 'publishedAt',
+          language: 'en'
+        }
+        const data = await makeApiCall(`${BASE_URL}/everything`, params)
+        console.log('NewsAPI: Response status:', data.status)
+        console.log('NewsAPI: Articles returned:', data.articles?.length || 0)
+        return data.articles || []
       } else {
+        console.log('NewsAPI: Using top-headlines endpoint')
         // Fallback to top-headlines for general/latest
-        const response = await axios.get(`${BASE_URL}/top-headlines`, {
-          params: {
-            apiKey: API_KEY,
-            category: category,
-            pageSize,
-            country: 'us'
-          }
-        })
-        return response.data.articles
+        const params = {
+          apiKey: API_KEY,
+          category: category,
+          pageSize: pageSize.toString(),
+          country: 'us'
+        }
+        const data = await makeApiCall(`${BASE_URL}/top-headlines`, params)
+        console.log('NewsAPI: Response status:', data.status)
+        console.log('NewsAPI: Articles returned:', data.articles?.length || 0)
+        return data.articles || []
       }
     } catch (error) {
-      console.error('Error fetching top headlines:', error)
+      console.error('NewsAPI Error in getTopHeadlines:', error)
+      console.error('NewsAPI Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      })
       return []
     }
   },
@@ -53,16 +91,15 @@ export const newsApi = {
   // Search articles by query
   async searchArticles(query, pageSize = 20) {
     try {
-      const response = await axios.get(`${BASE_URL}/everything`, {
-        params: {
-          apiKey: API_KEY,
-          q: query,
-          pageSize,
-          sortBy: 'publishedAt',
-          language: 'en'
-        }
-      })
-      return response.data.articles
+      const params = {
+        apiKey: API_KEY,
+        q: query,
+        pageSize: pageSize.toString(),
+        sortBy: 'publishedAt',
+        language: 'en'
+      }
+      const data = await makeApiCall(`${BASE_URL}/everything`, params)
+      return data.articles || []
     } catch (error) {
       console.error('Error searching articles:', error)
       return []
@@ -72,16 +109,34 @@ export const newsApi = {
   // Get latest articles (all categories)
   async getLatestArticles(pageSize = 20) {
     try {
-      const response = await axios.get(`${BASE_URL}/top-headlines`, {
-        params: {
-          apiKey: API_KEY,
-          country: 'us',
-          pageSize
-        }
-      })
-      return response.data.articles
+      console.log('NewsAPI: getLatestArticles called with pageSize:', pageSize)
+      console.log('NewsAPI: API_KEY available:', !!API_KEY)
+      console.log('NewsAPI: API_KEY value:', API_KEY ? '***' + API_KEY.slice(-4) : 'NOT SET')
+
+      const params = {
+        apiKey: API_KEY,
+        country: 'us',
+        pageSize: pageSize.toString()
+      }
+
+      const data = await makeApiCall(`${BASE_URL}/top-headlines`, params)
+
+      console.log('NewsAPI: getLatestArticles response status:', data.status)
+      console.log('NewsAPI: getLatestArticles articles returned:', data.articles?.length || 0)
+
+      if (data.articles?.length > 0) {
+        console.log('NewsAPI: First article title:', data.articles[0].title)
+      }
+
+      return data.articles || []
     } catch (error) {
-      console.error('Error fetching latest articles:', error)
+      console.error('NewsAPI Error in getLatestArticles:', error)
+      console.error('NewsAPI Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      })
       return []
     }
   }
