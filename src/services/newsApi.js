@@ -5,22 +5,34 @@ const BASE_URL = 'https://newsapi.org/v2'
 
 // CORS proxy for development/production
 const CORS_PROXY = 'https://api.allorigins.win/get?url='
-const USE_CORS_PROXY = true // Set to false if you have a different CORS solution
+const USE_CORS_PROXY = true // Re-enable CORS proxy with proper implementation
 
 // Helper function to make API calls with CORS proxy if needed
 const makeApiCall = async (url, params) => {
   if (USE_CORS_PROXY) {
-    // Use CORS proxy
-    const fullUrl = `${CORS_PROXY}${encodeURIComponent(url + '?' + new URLSearchParams(params).toString())}`
-    console.log('Using CORS proxy URL:', fullUrl)
+    // Construct the full target URL first
+    const queryString = new URLSearchParams(params).toString()
+    const targetUrl = `${url}?${queryString}`
+    console.log('Target NewsAPI URL:', targetUrl)
 
-    const response = await axios.get(fullUrl)
+    // Use CORS proxy - only encode the target URL once
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`
+    console.log('CORS proxy URL:', proxyUrl)
+
+    const response = await axios.get(proxyUrl)
     console.log('CORS proxy response status:', response.status)
 
-    // The CORS proxy wraps the response in a 'contents' field
-    const actualData = JSON.parse(response.data.contents)
-    console.log('Parsed data status:', actualData.status)
-    return actualData
+    // Check if response has contents field
+    if (response.data && response.data.contents) {
+      // The CORS proxy wraps the response in a 'contents' field
+      const actualData = JSON.parse(response.data.contents)
+      console.log('Parsed NewsAPI status:', actualData.status)
+      return actualData
+    } else {
+      // Fallback - sometimes the proxy returns data directly
+      console.log('No contents field, using response data directly')
+      return response.data
+    }
   } else {
     // Direct API call
     const response = await axios.get(url, { params })
